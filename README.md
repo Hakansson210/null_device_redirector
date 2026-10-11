@@ -18,3 +18,10 @@ Call third-party code that is noisy on stdout/stderr during setup, import, or te
 ## Edge you will hit
 
 If a library caches `sys.stdout` at import time (e.g. `logger = logging.StreamHandler(sys.stdout)` evaluated once when the module loads), replacing `sys.stdout` later will not affect that cached reference. Redirect that handler explicitly, or import the noisy library inside the `with suppress_output():` block so its capture happens while the redirect is active.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
